@@ -158,6 +158,17 @@ jobs:
             ${{ env.REDIS_DIST }}-msys2-with-Service.zip
             hashes-msys2.txt
 
+      - name: Build Redis Modules with MSYS2
+        run: |
+          # 假设模块源码位于 redis-${{ env.RELEASE_VERSION }}/modules
+          cd redis-${{ env.RELEASE_VERSION }}/modules
+          make -j$(nproc)
+          cd ../..
+          
+          # 将编译好的模块文件复制到打包目录
+          cp redis-${{ env.RELEASE_VERSION }}/modules/*.so ${{ env.REDIS_DIST }}-msys2/
+          cp redis-${{ env.RELEASE_VERSION }}/modules/*.so ${{ env.REDIS_DIST }}-msys2-with-Service/
+
   build-cygwin:
     needs: prepare
     runs-on: windows-latest
@@ -251,6 +262,17 @@ jobs:
             ${{ env.REDIS_DIST }}-cygwin.zip
             ${{ env.REDIS_DIST }}-cygwin-with-Service.zip
             hashes-cygwin.txt
+
+      - name: Build Redis Modules with Cygwin
+        run: |
+          # 假设模块源码位于 redis-${{ env.RELEASE_VERSION }}/modules
+          cd redis-${{ env.RELEASE_VERSION }}/modules
+          make -j$(nproc)
+          cd ../..
+          
+          # 将编译好的模块文件复制到打包目录
+          cp redis-${{ env.RELEASE_VERSION }}/modules/*.dll ${{ env.REDIS_DIST }}-cygwin/
+          cp redis-${{ env.RELEASE_VERSION }}/modules/*.dll ${{ env.REDIS_DIST }}-cygwin-with-Service/
 
   release:
     needs: [prepare, build-msys2, build-cygwin]
